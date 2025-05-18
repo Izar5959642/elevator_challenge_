@@ -119,7 +119,7 @@ class Building():
         return
     
     # Update the state of all elevators and floors.
-    def updateAll(self):
+    def updateAll(self,scroll_y):
         """
         Update the state of all elevators and floors.
         Arguments:
@@ -128,7 +128,7 @@ class Building():
             None
         """
         for i in range(self.num_floors):
-            self.floors[i].update() 
+            self.floors[i].update(scroll_y) 
         for i in range(self.num_elevator):
             self.elevators[i].update()
 

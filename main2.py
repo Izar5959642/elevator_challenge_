@@ -46,7 +46,8 @@ for config in building_configs:
 screen = pygame.display.set_mode((current_x_pos , SCREEN_HEIGHT))
 
 scrollable_surface = pygame.Surface((current_x_pos, max_building_height), pygame.SRCALPHA)
-
+scrollable_surface_y_position = max(0,(max_building_height - SCREEN_HEIGHT))
+scroll_y  = scrollable_surface_y_position
 # Main loop
 run = True
 while run:
@@ -55,11 +56,11 @@ while run:
     screen.fill((255, 255, 255))
 
     for building  in (buildings):
-        building.updateAll()  
+        building.updateAll(scroll_y)  
         building.drawAll()
-        scrollable_surface.blit(building.surface, (building.current_x_pos, 0))  
+        scrollable_surface.blit(building.surface, (building.current_x_pos, scrollable_surface_y_position))  
 
-    screen.blit(scrollable_surface, (0, 0) )    
+    screen.blit(scrollable_surface, (0, -scroll_y) )    
     
 
     for event in pygame.event.get():
@@ -70,10 +71,16 @@ while run:
             pos_click_mouse = pygame.mouse.get_pos()
             for building in buildings:
                 local_x = pos_click_mouse[0] - building.current_x_pos
-                local_y = pos_click_mouse[1]
+                local_y = pos_click_mouse[1] - scroll_y
                 if 0 <= local_x < building.width:
                     building.getMouseClickPos()
                     break
+        if event.type == pygame.MOUSEWHEEL:
+            scroll_y -= event.y * 20
+            scroll_y = max(0, min(scroll_y, max_building_height - SCREEN_HEIGHT))
+            # scrollable_surface_y_position = scroll_y
+            # print("--",scroll_y,pos_click_mouse[1],local_y, event.y, max_building_height, SCREEN_HEIGHT )
+            print(f"-- --scroll_y = {scroll_y},pos_click_mouse[1] = {pos_click_mouse[1]},local_y = {local_y},scrollable_surface_y_position = {scrollable_surface_y_position}, max_building_height = {max_building_height}"  )
 
     pygame.display.update()
 

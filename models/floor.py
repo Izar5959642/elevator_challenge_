@@ -34,22 +34,22 @@ class Button:
         # print("in button ", current_x_pos, self.rect)
         # print ("self.x_pos ", self.x_pos)
 
-    def handleEvent(self, event):
-        """
-        Handle mouse events for the button.
-        Arguments:
-            event (pygame.event.Event): The mouse event to handle.
+    # def handleEvent(self, event):
+    #     """
+    #     Handle mouse events for the button.
+    #     Arguments:
+    #         event (pygame.event.Event): The mouse event to handle.
 
-        Returns:
-            bool: True if the button was pressed, False otherwise.
-        """
+    #     Returns:
+    #         bool: True if the button was pressed, False otherwise.
+    #     """
         
-        print ("event.ppos", event.pos)
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
-            if self.rect.collidepoint(event.pos):  # Check if the click is within the button's rect
-                self.button_press = True
-                return True
-        return False
+    #     print ("event.ppos", event.pos)
+    #     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+    #         if self.rect.collidepoint(event.pos):  # Check if the click is within the button's rect
+    #             self.button_press = True
+    #             return True
+    #     return False
 
     def isPressed(self):
         """
@@ -62,6 +62,7 @@ class Button:
         
         if pygame.mouse.get_pressed()[0]:  # Check if the left mouse button is pressed
             if self.rect.collidepoint(pygame.mouse.get_pos()):
+                print ("pygame.mouse.get_pressed()[0] ", pygame.mouse.get_pos()[1])
                 return True
         return False
     
@@ -163,19 +164,19 @@ class Floor:
         self.current_x_pos = current_x_pos
         self.end_floor = num_floors - 1
         self.button = Button(self.num_floor, self.y_pos, self.current_x_pos)
+        print ("in floor ", num_floor, self.y_pos, self.button.rect)
 
 
+    # def handleEvent(self, event):
+    #     """
+    #     Handle mouse events for the floor.
+    #     Arguments:
+    #         event (pygame.event.Event): The mouse event to handle.
 
-    def handleEvent(self, event):
-        """
-        Handle mouse events for the floor.
-        Arguments:
-            event (pygame.event.Event): The mouse event to handle.
-
-        Returns:
-            bool: True if the button on this floor was pressed, False otherwise.
-        """
-        return self.button.handleEvent(event)
+    #     Returns:
+    #         bool: True if the button on this floor was pressed, False otherwise.
+    #     """
+    #     return self.button.handleEvent(event)
     
     # Set the floor timer and update its state.
     def byOrder(self, time):
@@ -193,7 +194,7 @@ class Floor:
         
 
     # Update the floor's state, including the timer and button state.
-    def update(self):
+    def update(self,scroll_y):
         """
         Update the floor's timer and button state.
         Arguments:
@@ -201,7 +202,8 @@ class Floor:
 
         Returns:
             None
-        """       
+        """ 
+        # self.y_pos =  + scroll_y              
         diff = time.time() - self.last_update
         self.last_update = time.time()
 
@@ -212,7 +214,7 @@ class Floor:
             self.flag_in_execution = False
         self.convertTimeStr()
         self.button.update(self.flag_in_execution)
- 
+
     # Convert the timer to a string format.
     def convertTimeStr(self):
         """

@@ -50,7 +50,7 @@ PAUSE = 2                            # Pause duration in seconds
 
 #building
 BUILDING_HIGHT = (NUM_FLOORS + 1  ) * (FLOOR_HEIGHT + SPACER_HEIGHT)
-SCREEN_HEIGHT =    min(800, BUILDING_HIGHT)        
+SCREEN_HEIGHT =  800  #min(800, BUILDING_HIGHT)        
 ZERO_FLOOR = SCREEN_HEIGHT - FLOOR_HEIGHT + SPACER_HEIGHT   # Y position of the ground floor
 BUILDING_WIDTH = FLOOR_WIDTH + START_X_POS_FLOOR + (NUM_ELV * ELV_WIDTH)
 NUM_BUILDINGS = 4
