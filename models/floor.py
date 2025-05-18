@@ -31,25 +31,6 @@ class Button:
             SIZE_BUTTON * 2,           # width
             SIZE_BUTTON * 2            # height
         )
-        # print("in button ", current_x_pos, self.rect)
-        # print ("self.x_pos ", self.x_pos)
-
-    # def handleEvent(self, event):
-    #     """
-    #     Handle mouse events for the button.
-    #     Arguments:
-    #         event (pygame.event.Event): The mouse event to handle.
-
-    #     Returns:
-    #         bool: True if the button was pressed, False otherwise.
-    #     """
-        
-    #     print ("event.ppos", event.pos)
-    #     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
-    #         if self.rect.collidepoint(event.pos):  # Check if the click is within the button's rect
-    #             self.button_press = True
-    #             return True
-    #     return False
 
     def isPressed(self):
         """
@@ -57,68 +38,23 @@ class Button:
         Returns:
             bool: True if the button is pressed, False otherwise.
         """
-        # Use the pygame mouse method to directly check collision
-        # print("pygame.mouse.get_pos() ", pygame.mouse.get_pos())
-        
         if pygame.mouse.get_pressed()[0]:  # Check if the left mouse button is pressed
             if self.rect.collidepoint(pygame.mouse.get_pos()):
-                print ("pygame.mouse.get_pressed()[0] ", pygame.mouse.get_pos()[1])
                 return True
         return False
     
-    # Check if the x, y position of the mouse is in the range of the button.
-    def checkPress(self):
-        ''''
-        Check if the mouse is over the button.
-        Arguments:
-            x_mouse (int): The x position of the mouse.
-            y_mouse (int): The y position of the mouse.
-
-        Returns:
-            bool: True if the mouse is over the button, False otherwise.
-        '''''
-        return self.isPressed()
-    
-
-        # if  not x_mouse in range(int(X_START_POS_BUTTON_CLICK), int(X_END_POS_BUTTON)) :
-        #     return False
-        # if y_mouse in range(int(self.y_pos - SIZE_BUTTON),int( self.y_pos + SIZE_BUTTON)):
-        #     return True
-        # else:
-        #     return False
-        
-
-   
-    # # Update the button state based on whether it is pressed.
-    # def update(self , button_press ):
-    #     ''''
-    #     Update the button's state and coller button.
-    #     Arguments:
-    #         button_press (bool): True if the button is pressed, False otherwise.
-
-    #     Returns:
-    #         None
-    #     '''''
-    #     if button_press == True:
-    #         self.button_press = True
-    #         self.col_button = COL_BUTTON_ON
-    #     else:
-    #         self.button_press = False
-    #         self.col_button = COL_BUTTON_OFF
-    #     self.text_button = self.font.render( self.str_num_floor, True, self.col_button, self.background)
-
-    def update(self, button_press):
+    def update(self, button_press, scroll_y):
         """
         Update the button's state and color.
         """
-        if self.isPressed():
-            
+        self.rect.y = self.y_pos - SIZE_BUTTON - scroll_y
+
+        if self.isPressed() or button_press:   
             self.button_press = True
             self.col_button = COL_BUTTON_ON
         else:
             self.button_press = False
             self.col_button = COL_BUTTON_OFF
-
         self.text_button = self.font.render(self.str_num_floor, True, self.col_button, self.background)
 
 
@@ -148,7 +84,7 @@ class Floor:
     - Draw the floor and its components on the screen.
     """
 
-    def __init__(self , num_floor,floor_img, num_floors, current_x_pos) -> None:
+    def __init__(self , num_floor,floor_img, num_floors, current_x_pos, max_building_height) -> None:
         self.num_floor = num_floor
         self.x_pos = START_X_POS_FLOOR
         self.y_pos = ZERO_FLOOR - (FLOOR_HEIGHT * num_floor) 
@@ -160,25 +96,11 @@ class Floor:
         self.flag_in_execution= False
         self.font = pygame.font.Font('freesansbold.ttf', SIZE_BUTTON)
         # self.rect = self.img.get_rect(center=(self.x_pos, self.y_pos))
-
         self.current_x_pos = current_x_pos
         self.end_floor = num_floors - 1
         self.button = Button(self.num_floor, self.y_pos, self.current_x_pos)
-        print ("in floor ", num_floor, self.y_pos, self.button.rect)
 
-
-    # def handleEvent(self, event):
-    #     """
-    #     Handle mouse events for the floor.
-    #     Arguments:
-    #         event (pygame.event.Event): The mouse event to handle.
-
-    #     Returns:
-    #         bool: True if the button on this floor was pressed, False otherwise.
-    #     """
-    #     return self.button.handleEvent(event)
-    
-    # Set the floor timer and update its state.
+ 
     def byOrder(self, time):
         """
         Set the floor's timer and mark it as active.
@@ -202,8 +124,7 @@ class Floor:
 
         Returns:
             None
-        """ 
-        # self.y_pos =  + scroll_y              
+        """             
         diff = time.time() - self.last_update
         self.last_update = time.time()
 
@@ -213,7 +134,7 @@ class Floor:
             self.col_num = BLACK
             self.flag_in_execution = False
         self.convertTimeStr()
-        self.button.update(self.flag_in_execution)
+        self.button.update(self.flag_in_execution, scroll_y)
 
     # Convert the timer to a string format.
     def convertTimeStr(self):
@@ -248,9 +169,6 @@ class Floor:
             pygame.draw.rect(screen, (BLACK), (self.x_pos  ,self.y_pos - SPACER_HEIGHT , FLOOR_WIDTH, SPACER_HEIGHT))
         else:
             pygame.draw.rect(screen, (GREEN), (self.x_pos  ,self.y_pos - SPACER_HEIGHT , FLOOR_WIDTH, SPACER_HEIGHT + 10))
-
-        #     pygame.draw.polygon(screen, BLACK, roof_vertices)
-
         # If the floor has an active timer, draw the timer on the screen.
         if self.flag_in_execution:
             timer_print = self.timer_str

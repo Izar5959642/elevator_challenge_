@@ -14,8 +14,9 @@ class BuilderFactory(ABC):
         pass
 
 class ElevatorFactory(BuilderFactory):
-    def create_floor(self, id, img_floor, num_floors, current_x_pos):
-        return Floor(id, img_floor, num_floors, current_x_pos)
+    def create_floor(self, id, img_floor, num_floors, current_x_pos, max_building_height):
+
+        return Floor(id, img_floor, num_floors, current_x_pos, max_building_height)
     
     def create_elevator(self, id, img_elv):
         return Elevator(id, img_elv)
@@ -31,36 +32,19 @@ class Building():
     - Update the state of all elevators and floors.
     - Draw all elevators and floors on the screen.
     """
-
-    # def __init__(self, num_elevator, num_floors, current_x_pos, factory: BuilderFactory) -> None:
-        # self.img_elv = pygame.image.load(IMG_ELV)
-        # self.img_floor = pygame.image.load(IMG_FLOOR)
-        # self.elevators = []
-        # self.floors = []
-        # self.width = num_elevator * ELV_WIDTH + FLOOR_WIDTH
-        # self.height = num_floors * FLOOR_HEIGHT
-        # self.num_floors = num_floors
-        # self.num_elevator = num_elevator
-
-        # self.current_x_pos = current_x_pos
-        # # Initialize elevators.
-        # for i in range(num_elevator):
-        #     self.elevators.append(factory.create_elevator(i, self.img_elv))
-        # # Initialize floors.
-        # for i in range(num_floors):
-        #     # print("in create building ", i, self.current_x_pos)
-        #     self.floors.append(factory.create_floor(i, self.img_floor, num_floors, self.current_x_pos))
-    def __init__(self, num_elevator, num_floors, current_x_pos, factory: BuilderFactory) -> None:
+    def __init__(self, num_elevator, num_floors, current_x_pos, max_building_height,  factory: BuilderFactory) -> None:
         self.num_elevator = num_elevator
         self.num_floors = num_floors
         self.current_x_pos = current_x_pos
         self.factory = factory
         self.width = num_elevator * ELV_WIDTH + START_X_POS_ELV + START_X_POS_FLOOR 
         self.height = num_floors * FLOOR_HEIGHT
-        self.floors = [factory.create_floor(i, pygame.image.load(IMG_FLOOR), num_floors, current_x_pos) for i in range(num_floors)]
+        self.height_surface = max_building_height
+        self.floors = [factory.create_floor(i, pygame.image.load(IMG_FLOOR), num_floors, current_x_pos, self.height_surface) for i in range(num_floors)]
+
         self.elevators = [factory.create_elevator(i, pygame.image.load(IMG_ELV)) for i in range(num_elevator)]
         self.surface = self.createSurface()  # Create the surface during initialization
-       
+
 
     def createSurface(self):
         """
@@ -69,11 +53,9 @@ class Building():
         Arguments:
             current_x_pos (int): The x position of the building in the world.
         """
-        building_surface = pygame.Surface((self.width , max(self.height, SCREEN_HEIGHT)), pygame.SRCALPHA)
+        building_surface = pygame.Surface((self.width , self.height_surface), pygame.SRCALPHA)
         return building_surface
     
-
-
 
     # Check if the mouse click is on any floor button, and handle the request if it is.
     def getMouseClickPos(self):
@@ -142,7 +124,6 @@ class Building():
             None
         """
         self.surface.fill((0, 0, 0, 0)) 
-
         for floor in self.floors:
             floor.draw(self.surface)
         for elv in self.elevators:

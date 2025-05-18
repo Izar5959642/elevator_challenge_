@@ -4,13 +4,15 @@
 # import sys
 
 
-building_configs = [(3, 5), (4, 6), (2, 4)] 
+# 2. Screen
+SCREEN_WIDTH = 1500  
+SCROLL_SPEED = 20   
+SCREEN_HEIGHT =  800  #min(800, BUILDING_HIGHT) 
+
 
 WINDOW_SIZE = 1200, 1000
 
-# 2. Screen
-SCREEN_WIDTH = 1500  
-SCROLL_SPEED = 20        
+
 
 # 3. Floor
 NUM_FLOORS = 10           # Number of floors
@@ -50,8 +52,19 @@ PAUSE = 2                            # Pause duration in seconds
 
 #building
 BUILDING_HIGHT = (NUM_FLOORS + 1  ) * (FLOOR_HEIGHT + SPACER_HEIGHT)
-SCREEN_HEIGHT =  800  #min(800, BUILDING_HIGHT)        
-ZERO_FLOOR = SCREEN_HEIGHT - FLOOR_HEIGHT + SPACER_HEIGHT   # Y position of the ground floor
+def ZERO_FLOOR_ (surface_height):
+    return surface_height - FLOOR_HEIGHT + SPACER_HEIGHT  # Y position of the ground floor
+
+
+# Define building configurations (NUM_ELV, NUM_FLOORS)
+BUILDING_CONFIGS = [(3, 15), (4, 6), (2, 4)]  # Example configurations
+_MAX_BUILDING_HEIGHT = max(config[1] * FLOOR_HEIGHT for config in BUILDING_CONFIGS)
+MAX_BUILDING_HEIGHT = max(_MAX_BUILDING_HEIGHT, SCREEN_HEIGHT)  # Ensure it's at least the screen height
+
+
+
+
+ZERO_FLOOR = MAX_BUILDING_HEIGHT - FLOOR_HEIGHT + SPACER_HEIGHT   # Y position of the ground floor
 BUILDING_WIDTH = FLOOR_WIDTH + START_X_POS_FLOOR + (NUM_ELV * ELV_WIDTH)
 NUM_BUILDINGS = 4
 
