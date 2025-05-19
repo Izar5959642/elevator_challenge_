@@ -2,6 +2,7 @@ import pygame
 from my_setting import *
 import time
 
+
 class Elevator:
     """"
     The Elv class represents an elevator with methods to manage its movement and requests.
@@ -11,7 +12,7 @@ class Elevator:
     - Handle floor requests and calculate the time required to fulfill them.
     - Update the elevator's status and draw it on the screen.
     """""
-    def __init__(self,num_elv , elv_img) -> None:
+    def __init__(self,num_elv ) -> None:
         self.num_elv =  num_elv
         self.x_pos = START_X_POS_ELV + (DIFF_ELV * num_elv)
         self.y_pos = ZERO_FLOOR
@@ -20,7 +21,8 @@ class Elevator:
         self.last_update_time = time.time()
         self.list_req = []
         self.final_dest = 0
-        self.img = pygame.transform.scale(elv_img , (ELV_WIDTH,ELV_HEIGHT))
+        self.img = pygame.image.load(IMG_ELV)
+        self.img = pygame.transform.scale(self.img , (ELV_WIDTH,ELV_HEIGHT))
         self.pause = 0
         self.mp3 = pygame.mixer.Sound(MP3)
 
@@ -133,7 +135,7 @@ class Elevator:
         Returns:
             None
        '''''
-        screen.blit(self.img, (self.x_pos ,self.y_pos) )
+        screen.blit(self.img, (self.x_pos ,self.y_pos))
 
 
 

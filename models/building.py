@@ -1,27 +1,27 @@
-import pygame
+from pygame.locals import *
+
 from my_setting import *
 from models.floor import *
 from models.elevator import *
-from abc import ABC, abstractmethod
-from pygame.locals import *
-class BuilderFactory(ABC):
+
+from factories.builder_factory import *
+
+class IBuilding(ABC):
+    """
+    Abstract base class for building.
+    """
     @abstractmethod
-    def create_elevator(self, id, img_elv):
+    def getNewReq(self, num_floor):
+        pass
+    @abstractmethod
+    def getMouseClickPos(self):
+        pass
+    @abstractmethod 
+    def updateAll(self,scroll_y):
         pass
     
-    @abstractmethod
-    def create_floor(self, id, img_floor, num_floors):
-        pass
 
-class ElevatorFactory(BuilderFactory):
-    def create_floor(self, id, img_floor, num_floors, current_x_pos, max_building_height):
-
-        return Floor(id, img_floor, num_floors, current_x_pos, max_building_height)
-    
-    def create_elevator(self, id, img_elv):
-        return Elevator(id, img_elv)
-
-class Building():
+class Building(IBuilding):
     """
     The Building class represents the entire building, containing multiple elevators and floors.
 
@@ -32,29 +32,31 @@ class Building():
     - Update the state of all elevators and floors.
     - Draw all elevators and floors on the screen.
     """
-    def __init__(self, num_elevator, num_floors, current_x_pos, max_building_height,  factory: BuilderFactory) -> None:
+    # def __init__(self, num_elevator, num_floors, current_x_pos, max_building_height,  factory: BuildingFactory) -> None:
+    def __init__(self, num_elevator, num_floors, current_x_pos, max_building_height, floors, elevators):
+   
         self.num_elevator = num_elevator
         self.num_floors = num_floors
         self.current_x_pos = current_x_pos
-        self.factory = factory
+        # self.factory = factory
         self.width = num_elevator * ELV_WIDTH + START_X_POS_ELV + START_X_POS_FLOOR 
         self.height = num_floors * FLOOR_HEIGHT
         self.height_surface = max_building_height
-        self.floors = [factory.create_floor(i, pygame.image.load(IMG_FLOOR), num_floors, current_x_pos, self.height_surface) for i in range(num_floors)]
+        self.floors = floors #[factory.create_floor(i, pygame.image.load(IMG_FLOOR), num_floors, current_x_pos, self.height_surface) for i in range(num_floors)]
 
-        self.elevators = [factory.create_elevator(i, pygame.image.load(IMG_ELV)) for i in range(num_elevator)]
-        self.surface = self.createSurface()  # Create the surface during initialization
+        self.elevators = elevators #[factory.create_elevator(i, pygame.image.load(IMG_ELV)) for i in range(num_elevator)]
+        self.surface = pygame.Surface((self.width , self.height_surface), pygame.SRCALPHA) 
 
 
-    def createSurface(self):
-        """
-        Create and return the surface for this building.
-        This surface includes all floors and elevators.
-        Arguments:
-            current_x_pos (int): The x position of the building in the world.
-        """
-        building_surface = pygame.Surface((self.width , self.height_surface), pygame.SRCALPHA)
-        return building_surface
+    # def createSurface(self):
+    #     """
+    #     Create and return the surface for this building.
+    #     This surface includes all floors and elevators.
+    #     Arguments:
+    #         current_x_pos (int): The x position of the building in the world.
+    #     """
+    #     building_surface = pygame.Surface((self.width , self.height_surface), pygame.SRCALPHA)
+    #     return building_surface
     
 
     # Check if the mouse click is on any floor button, and handle the request if it is.
@@ -114,18 +116,33 @@ class Building():
         for i in range(self.num_elevator):
             self.elevators[i].update()
 
-    # Draw all elevators and floors on the screen.       
+    # # Draw all elevators and floors on the screen.       
+    # def drawAll(self):
+    #     """
+    #     Draw all elevators and floors on the screen.
+    #     Arguments:
+    #         screen (pygame.Surface): The screen on which to draw the elevators and floors.
+    #     Returns:
+    #         None
+    #     """
+    #     self.surface.fill((0, 0, 0, 0)) 
+    #     for floor in self.floors:
+    #         self.surface.blit(floor.surface, (floor.current_x_pos, floor.y_pos))
+    #         floor.draw()
+    #     for elv in self.elevators:
+    #         elv.draw(self.surface)
+        
     def drawAll(self):
         """
-        Draw all elevators and floors on the screen.
-        Arguments:
-            screen (pygame.Surface): The screen on which to draw the elevators and floors.
-        Returns:
-            None
+        Draw all elevators and floors on the building's surface.
         """
-        self.surface.fill((0, 0, 0, 0)) 
+        self.surface.fill((0, 0, 0, 0))  # Clear the building's surface
+
+        # Draw each floor's surface onto the building's surface
         for floor in self.floors:
-            floor.draw(self.surface)
+            floor.draw()  # Update the floor's surface
+            self.surface.blit(floor.surface, (floor.x_pos, floor.y_pos))
+
+        # Draw elevators
         for elv in self.elevators:
             elv.draw(self.surface)
-        
