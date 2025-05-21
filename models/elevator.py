@@ -1,164 +1,75 @@
 import pygame
-from my_setting import *
 import time
-
+from settings import *
 
 class Elevator:
-    """"
-    The Elv class represents an elevator with methods to manage its movement and requests.
+    """Represent an elevator with movement and request handling. """
 
-    Responsibilities:
-    - Manage the elevator's position and movement.
-    - Handle floor requests and calculate the time required to fulfill them.
-    - Update the elevator's status and draw it on the screen.
-    """""
-    def __init__(self,num_elv ) -> None:
-        self.num_elv =  num_elv
-        self.x_pos = START_X_POS_ELV + (DIFF_ELV * num_elv)
+    def __init__(self, elevator_id):
+        self.elevator_id = elevator_id
+        self.x_pos = START_X_POS_ELV + (DIFF_ELV * elevator_id)
         self.y_pos = ZERO_FLOOR
-        self.where_m_i = 0
+        self.current_floor = 0
         self.total_time = 0
-        self.last_update_time = time.time()
-        self.list_req = []
-        self.final_dest = 0
-        self.img = pygame.image.load(IMG_ELV)
-        self.img = pygame.transform.scale(self.img , (ELV_WIDTH,ELV_HEIGHT))
+        self.last_update = time.time()
+        self.requests = []
+        self.final_destination = 0
+        self.image = pygame.transform.scale(pygame.image.load(IMG_ELV), (ELV_WIDTH, ELV_HEIGHT))
+        self.sound = pygame.mixer.Sound(MP3)       
         self.pause = 0
-        self.mp3 = pygame.mixer.Sound(MP3)
 
+    def add_request(self, floor_number, total_time):
+        """Add a floor request and update total time."""
+        self.requests.append(floor_number)
+        self.total_time = total_time
+        self.final_destination = floor_number
 
-    # Add a new request to the elevator.
-    def appendReq(self, num_floor , new_total_time):
-        '''''
-        Add the requested floor to the list of requests and update the total time.
-        Arguments:
-            num_floor (int): The floor number to add to the request list.
-            new_total_time (float): The new total time for the elevator to process the request.
-
-        Returns:
-            None
-        '''''
-        self.list_req.append(num_floor)
-        self.total_time = new_total_time
-        self.final_dest = num_floor
-
-
-    # Calculate the time required for a new floor request.
-    def calculateTimeForNewReq(self, num_floor):
-        '''''
-        Calculate and return the time needed for the elevator to reach the requested floor.
-        Arguments:
-            num_floor (int): The floor number for which the time is to be calculated.
-
-        Returns:
-            float: The time required for the elevator to reach the requested floor.
-        '''''
-        # If the elevator is already at the requested floor.
-        if self.final_dest == num_floor:
+    def calculate_time_for_request(self, floor_number):
+        if self.final_destination == floor_number:
             return 0
-        diff = abs(self.final_dest - num_floor) * SEC_FOR_FLOOR 
-        final_time = diff + self.total_time 
-        return final_time
-    
-    # Main update function for the elevator.
-    def update(self):
-        '''
-        Updates the elevator's position and time.
-        Arguments:
-            None
-        Returns:
-            None
-        '''
-        #Update time.
-        diff = time.time() - self.last_update_time
-        self.last_update_time = time.time()
-        self.updateTotalTime(diff)
-        # Update x and y position.       
-        if  self.list_req:
-            self.move(diff)
-        return
-    
-    def updateTotalTime(self,diff):
-        '''''
-        Update the total time if needed.
-        Arguments:
-            diff (float): The time difference between the current time and the last update time.
+        diff = abs(self.final_destination - floor_number) * SEC_FOR_FLOOR
+        return diff + self.total_time
 
-        Returns:
-            None
-        '''''
+    def update(self):
+        """Update elevator position and time."""
+        diff = time.time() - self.last_update
+        self.last_update = time.time()
+        self.update_total_time(diff)
+        if self.requests:
+            self.move(diff)
+        
+        
+    def update_total_time(self, diff):
+        """Update remaining time for requests."""
         if self.total_time >= 0.01:
             self.total_time -= diff
         else:
             self.total_time = 0
 
-    def move(self , diff):
-        '''''
-        Update the y position of the elevator if needed.
-        Arguments:
-            diff (float): The time difference between the current time and the last update time.
-
-        Returns:
-            None
-        '''''
-        # Get the current destination from the list and calculate the y position.
-        current_dest = self.list_req[0]
-        y_floor = ZERO_FLOOR - (FLOOR_HEIGHT * current_dest)
+    def move(self, diff):
+        """Move elevator to the target floor."""
+        target_floor = self.requests[0]
+        target_y = ZERO_FLOOR - (FLOOR_HEIGHT * target_floor)
         distance = PIX_PER_SEC * diff
-         # # Use where_m_i to understand if the elevator is moving up or down.
-        direction = 1 if self.where_m_i > current_dest else -1
-        distance *= direction
-        if (self.y_pos) != (y_floor): 
-        # Move the elevator to the y_floor.
+        direction = 1 if self.current_floor > target_floor else -1
+        distance *= direction 
+
+        if self.y_pos !=  target_y:
             self.y_pos += distance
-            if direction == 1 and self.y_pos > y_floor or direction == -1 and self.y_pos < y_floor:
-                self.y_pos = y_floor 
+            if (direction == 1 and self.y_pos > target_y) or (direction == -1 and self.y_pos < target_y):
+                self.y_pos = target_y
                 self.pause = PAUSE
-
-
-        # when the y_elv == y_floor, arrive to the floor .
-        elif self.pause > 0:  
+        elif self.pause > 0:
             if self.pause == PAUSE:
-                  self.mp3.play()
+                self.sound.play()
             self.pause -= diff
         else:
-            # After waiting 2 sec, remove the floor request from the list and update where_m_i.
-            self.where_m_i = self.list_req.pop(0)   
-        return
-    
-    def draw(self,screen):
-        '''''
-        Draw the elevator image on the screen.
-        Arguments:
-            screen (pygame.Surface): The screen on which to draw the elevator image.
+            self.current_floor = self.requests.pop(0)
+        
 
-        Returns:
-            None
-       '''''
-        screen.blit(self.img, (self.x_pos ,self.y_pos))
+    def draw(self, surface):
+        """Draw the elevator on the given surface."""
+        surface.blit(self.image, (self.x_pos, self.y_pos))
 
 
-
-
-
-
-
-
-
-
-    # def draw(self, screen, x_offset):
-    #     screen.blit(self.image, (x_offset + self.x, self.y))
-   
-            # if self.where_m_i < current_dest:
-            #     if self.y_pos > y_floor:
-            #         self.y_pos -= distance 
-            #     else:
-            #         self.y_pos = y_floor
-            #         self.puse = PUSE
-            # # If the movement is down
-            # elif self.where_m_i > current_dest:
-            #     if self.y_pos < y_floor:
-            #         self.y_pos += distance
-            #     else:
-            #         self.y_pos = y_floor
-            #         self.puse = PUSE
+# dalta().get_dalta()

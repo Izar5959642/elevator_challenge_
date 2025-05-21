@@ -1,62 +1,31 @@
 from abc import ABC, abstractmethod
-
-import pygame
-from models.building import Building, IBuilding
-from models.elevator import Elevator
+from models.building import Building
 from models.floor import Floor
-from my_setting import IMG_FLOOR , IMG_ELV 
+from models.elevator import Elevator
 
+class AbstractBuildingFactory(ABC):
+    """Abstract factory for creating building components."""
+    @abstractmethod
+    def create_floor(self, floor_id, total_floors, x_pos, max_height):
+        pass
 
-# class BuilderFactory(ABC):
-#     @abstractmethod
-#     def create_elevator(self, id, img_elv):
-#         pass
-    
-#     @abstractmethod
-#     def create_floor(self, id, img_floor, num_floors):
-#         pass
+    @abstractmethod
+    def create_elevator(self, elevator_id):
+        pass
 
+    @abstractmethod
+    def create_building(self, num_elevators, num_floors, x_pos, max_height):
+        pass
 
-# class BuildingFactory(BuilderFactory):
+class BuildingFactory(AbstractBuildingFactory):
+    """Concrete factory for creating standard building components."""
+    def create_floor(self, floor_id, total_floors, x_pos, max_height):
+        return Floor(floor_id, total_floors, x_pos, max_height)
 
-#     def create_floor(self, id, img_floor, num_floors, current_x_pos, max_building_height):
-#         return Floor(id, img_floor, num_floors, current_x_pos, max_building_height)
-    
-#     def create_elevator(self, id, img_elv):
-#         return Elevator(id, img_elv)
-    
+    def create_elevator(self, elevator_id):
+        return Elevator(elevator_id)
 
-# class BuildingFactory:
-#     def __init__(self, factory):
-#         self.factory = factory
-
-#     def create_building(self, num_elevators, num_floors, current_x_pos, max_building_height):
-#         return Building(num_elevators, num_floors, current_x_pos, max_building_height, self.factory)
-
-
-
-# class BuildingFactory:
-#     def __init__(self, factory):
-#         self.factory = factory
-
-#     def create_building(self, num_elevators, num_floors, current_x_pos, max_building_height):
-#         return Building(num_elevators, num_floors, current_x_pos, max_building_height, self.factory)
-    
-#     def create_floor(self, id, img_floor, num_floors, current_x_pos, max_building_height):
-#         return Floor(id, img_floor, num_floors, current_x_pos, max_building_height)
-#     def create_elevator(self, id, img_elv):
-#         return Elevator(id, img_elv)
-
-class BuildingFactory:
-    """
-    A factory class responsible for creating buildings, floors, and elevators.
-    """
-
-    def create_building(self, num_elevators, num_floors, current_x_pos, max_building_height) -> IBuilding:
-        """
-        Create a Building object with the specified parameters.
-        """
-        floors = [Floor(i, num_floors, current_x_pos, max_building_height) for i in range(num_floors)]
-        elevators = [Elevator(i) for i in range(num_elevators)]
-        return Building(num_elevators, num_floors, current_x_pos, max_building_height, floors, elevators)
-
+    def create_building(self, num_elevators, num_floors, x_pos, max_height):
+        floors = [self.create_floor(i, num_floors, x_pos, max_height) for i in range(num_floors)]
+        elevators = [self.create_elevator(i) for i in range(num_elevators)]
+        return Building(num_elevators, num_floors, x_pos, max_height, floors, elevators)

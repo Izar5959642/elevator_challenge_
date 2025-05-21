@@ -1,75 +1,43 @@
 import pygame
-from my_setting import *
-
-
+from settings import *
 
 class Button:
-    """
-    The Button class represents a button in the elevator system.
-
-    Responsibilities:
-    - Manage the button's state (pressed or not pressed).
-    - Check if the button has been pressed based on mouse position.
-    - Update the button's appearance and draw it on the screen.
-    """
-
-    def __init__(self, num_button, y_pos, current_x_pos) -> None:
+    """Represents a button on a floor for requesting an elevator."""
+    def __init__ (self, floor_number, y_pos, building_x_pos):
         self.x_pos = X_START_POS_BUTTON
-        self.is_x_pos = FLOOR_WIDTH / 2 
+        self.center_x = FLOOR_WIDTH / 2
         self.y_pos = y_pos + (FLOOR_HEIGHT / 2)
-        self.is_y_pos = MID_Y_POS + SPACER_HEIGHT
+        self.center_y = MID_Y_POS + SPACER_HEIGHT
         self.background = WHITE
-        self.col_button = COL_BUTTON_OFF
+        self.color = COL_BUTTON_OFF
         self.font = pygame.font.Font('freesansbold.ttf', SIZE_BUTTON_NUM)
-        self.button_press = False
-        self.str_num_floor = str(num_button)
-        self.text_button = self.font.render( self.str_num_floor, True, self.col_button, self.background)
-        
-
+        self.is_pressed = False
+        self.floor_label = str(floor_number)
+        self.text = self.font.render(self.floor_label, True, self.color, self.background)
         self.rect = pygame.Rect(
-            current_x_pos  + self.x_pos - SIZE_BUTTON ,  # x-coordinate
-            self.y_pos - SIZE_BUTTON,  # y-coordinate
-            SIZE_BUTTON * 2,           # width
-            SIZE_BUTTON * 2            # height
+            building_x_pos + self.x_pos -SIZE_BUTTON,
+            self.y_pos - SIZE_BUTTON,
+            SIZE_BUTTON * 2,
+            SIZE_BUTTON * 2
         )
 
-    def isPressed(self):
-        """
-        Check if the button was pressed.
-        Returns:
-            bool: True if the button is pressed, False otherwise.
-        """
-        if pygame.mouse.get_pressed()[0]:  # Check if the left mouse button is pressed
-            if self.rect.collidepoint(pygame.mouse.get_pos()):
-                return True
-        return False
+    def check_pressed(self):
+        """Check if the button is pressed by the mouse. """
+        return pygame.mouse.get_pressed()[0] and self.rect.collidepoint(pygame.mouse.get_pos())
+        
     
-    def update(self, button_press, scroll_y):
-        """
-        Update the button's state and color.
-        """
+    def update(self, is_active, scroll_y):
+        """Update button state and appearance based on activity and scroll position."""
         self.rect.y = self.y_pos - SIZE_BUTTON - scroll_y
+        self.is_pressed = self.check_pressed() or is_active
+        self.color = COL_BUTTON_ON if self.is_pressed else COL_BUTTON_OFF
+        self.text = self.font.render(self.floor_label, True, self.color, self.background)
 
-        if self.isPressed() or button_press:   
-            self.button_press = True
-            self.col_button = COL_BUTTON_ON
-        else:
-            self.button_press = False
-            self.col_button = COL_BUTTON_OFF
-        self.text_button = self.font.render(self.str_num_floor, True, self.col_button, self.background)
+    def draw(self, surface):
+        """Draw the button on the given surface"""
+        pygame.draw.circle(surface, WHITE, (self.center_x, self.center_y), SIZE_BUTTON)
+        pygame.draw.circle(surface, BLACK, (self.center_x, self.center_y), SIZE_BUTTON, 3)
+        surface.blit(self.text, self.text.get_rect(center=(self.center_x, self.center_y)))
 
 
-    # Draw the button on the screen.
-    def draw(self, screen):
-        '''''
-        Draw the button on the screen.
-        Arguments:
-            screen (pygame.Surface): The screen on which to draw the button.
-
-        Returns:
-            None
-        '''''
-        pygame.draw.circle(screen, (WHITE), ( self.is_x_pos, self.is_y_pos), SIZE_BUTTON )
-        pygame.draw.circle(screen, (BLACK), ( self.is_x_pos, self.is_y_pos), SIZE_BUTTON , 3)
-        screen.blit(self.text_button, self.text_button.get_rect(center=(self.is_x_pos, self.is_y_pos)))
-
+        
