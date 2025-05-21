@@ -1,5 +1,6 @@
 import pygame
 from factories.builder_factory import BuildingFactory
+from models.delta_time import DeltaTime
 from settings import BUILDING_CONFIGS, MAX_BUILDING_HEIGHT, SCREEN_HEIGHT
 
 # Initialize Pygame
@@ -58,6 +59,7 @@ scroll_y = max(0, MAX_BUILDING_HEIGHT - SCREEN_HEIGHT)
 run = True
 while run:
     run, scroll_y = handle_events(buildings, scroll_y)
+    DeltaTime().update_delta()
     draw_screen(screen, scrollable_surface, buildings, scroll_y)
 
 pygame.quit()

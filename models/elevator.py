@@ -1,7 +1,6 @@
 import pygame
-import time
+from models.delta_time import DeltaTime
 from settings import *
-
 class Elevator:
     """Represent an elevator with movement and request handling. """
 
@@ -11,7 +10,6 @@ class Elevator:
         self.y_pos = ZERO_FLOOR
         self.current_floor = 0
         self.total_time = 0
-        self.last_update = time.time()
         self.requests = []
         self.final_destination = 0
         self.image = pygame.transform.scale(pygame.image.load(IMG_ELV), (ELV_WIDTH, ELV_HEIGHT))
@@ -32,12 +30,10 @@ class Elevator:
 
     def update(self):
         """Update elevator position and time."""
-        diff = time.time() - self.last_update
-        self.last_update = time.time()
+        diff = DeltaTime().delta_time
         self.update_total_time(diff)
         if self.requests:
             self.move(diff)
-        
         
     def update_total_time(self, diff):
         """Update remaining time for requests."""
@@ -70,6 +66,3 @@ class Elevator:
     def draw(self, surface):
         """Draw the elevator on the given surface."""
         surface.blit(self.image, (self.x_pos, self.y_pos))
-
-
-# dalta().get_dalta()

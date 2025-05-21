@@ -1,8 +1,7 @@
 import pygame
-import time
 from settings import *
+from models.delta_time import DeltaTime
 from models.button import Button
-
 class Floor:
     """Represents a floor with a button and timer."""
     def __init__(self, floor_number, total_floors, building_x_pos, max_height):
@@ -13,7 +12,6 @@ class Floor:
         self.timer_str = ''
         self.image = pygame.transform.scale(pygame.image.load(IMG_FLOOR), (FLOOR_WIDTH, FLOOR_HEIGHT - SPACER_HEIGHT))
         self.color = BLACK
-        self.last_update = time.time()
         self.is_active = False
         self.font = pygame.font.Font('freesansbold.ttf', SIZE_BUTTON)
         self.building_x_pos = building_x_pos
@@ -29,10 +27,8 @@ class Floor:
 
     def update(self, scroll_y):
         """Update timer and button state."""
-        diff = time.time() - self.last_update
-        self.last_update = time.time()
         if self.timer > 0:
-            self.timer -= diff
+            self.timer -= DeltaTime().delta_time
         else:
             self.color = BLACK
             self.is_active = False
