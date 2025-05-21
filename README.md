@@ -106,4 +106,4 @@ The project emphasizes Object-Oriented Programming with the following design cho
 For further assistance, contact the project author.
 
 ## Author
-Created by [Yizhar Dahan] for a job interview coding challenge.
+Created by Yizhar Dahan for a job interview coding challenge.
