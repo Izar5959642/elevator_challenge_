@@ -48,16 +48,17 @@ class Building(IBuilding):
             self.elevators[best_elevator_idx].add_request(floor_number, min_time + PAUSE)
             self.floors[floor_number].set_request(min_time)
 
-    def handle_mouse_click(self):
+    def handle_mouse_click(self, mouse_pos):
         """Process mouse clicks on floor buttons."""
         for floor_number, floor in enumerate(self.floors):
             if floor.button.check_pressed():
+                print(f"Checking floor {floor_number} at position {floor.button.rect.topright}, \n---mouse position : {mouse_pos}---")
                 self.handle_request(floor_number)
 
-    def update_all(self, scroll_y):
+    def update_all(self, scroll_y, scroll_x):
         """Update all floors and elevators."""
         for floor in self.floors:
-            floor.update(scroll_y)
+            floor.update(scroll_y, scroll_x)
         for elevator in self.elevators:
             elevator.update()
 

@@ -14,8 +14,9 @@ class Button:
         self.is_pressed = False
         self.floor_label = str(floor_number)
         self.text = self.font.render(self.floor_label, True, self.color, self.background)
+        self.building_x_pos = building_x_pos
         self.rect = pygame.Rect(
-            building_x_pos + self.x_pos -SIZE_BUTTON,
+            self.building_x_pos + self.x_pos - SIZE_BUTTON,
             self.y_pos - SIZE_BUTTON,
             SIZE_BUTTON * 2,
             SIZE_BUTTON * 2
@@ -26,9 +27,10 @@ class Button:
         return pygame.mouse.get_pressed()[0] and self.rect.collidepoint(pygame.mouse.get_pos())
         
     
-    def update(self, is_active, scroll_y):
+    def update(self, is_active, scroll_y, scroll_x):
         """Update button state and appearance based on activity and scroll position."""
         self.rect.y = self.y_pos - SIZE_BUTTON - scroll_y
+        self.rect.x = self.building_x_pos + self.x_pos - SIZE_BUTTON - scroll_x
         self.is_pressed = self.check_pressed() or is_active
         self.color = COL_BUTTON_ON if self.is_pressed else COL_BUTTON_OFF
         self.text = self.font.render(self.floor_label, True, self.color, self.background)

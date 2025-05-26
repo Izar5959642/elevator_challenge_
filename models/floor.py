@@ -25,7 +25,7 @@ class Floor:
         self.color = GREEN
         self.is_active = True
 
-    def update(self, scroll_y):
+    def update(self, scroll_y, scroll_x):
         """Update timer and button state."""
         if self.timer > 0:
             self.timer -= DeltaTime().delta_time
@@ -33,7 +33,7 @@ class Floor:
             self.color = BLACK
             self.is_active = False
         self.update_timer_str()
-        self.button.update(self.is_active, scroll_y)
+        self.button.update(self.is_active, scroll_y, scroll_x)
 
     def update_timer_str(self):
         """Convert timer to string format for display."""
