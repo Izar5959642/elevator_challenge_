@@ -21,7 +21,6 @@ class IBuilding(ABC):
         pass
 
 
-
 class Building(IBuilding):
     """Represents a building with floors and elevators."""
     def __init__(self, num_elevators, num_floors, x_pos, max_height, floors, elevators):
@@ -29,7 +28,7 @@ class Building(IBuilding):
         self.num_floors = num_floors
         self.x_pos = x_pos
         self.width = num_elevators * ELV_WIDTH + START_X_POS_ELV + START_X_POS_FLOOR
-        self.height = num_floors * FLOOR_HEIGHT
+        self.height = num_floors * TOTAL_HEIGHT_FLOOR
         self.max_height = max_height
         self.floors = floors
         self.elevators = elevators
@@ -45,14 +44,13 @@ class Building(IBuilding):
             if time < min_time:
                 min_time, best_elevator_idx = time, i
         if not self.floors[floor_number].is_active:
-            self.elevators[best_elevator_idx].add_request(floor_number, min_time + PAUSE)
+            self.elevators[best_elevator_idx].add_request(floor_number, min_time)
             self.floors[floor_number].set_request(min_time)
 
-    def handle_mouse_click(self, mouse_pos):
+    def handle_mouse_click(self):
         """Process mouse clicks on floor buttons."""
         for floor_number, floor in enumerate(self.floors):
             if floor.button.check_pressed():
-                print(f"Checking floor {floor_number} at position {floor.button.rect.topright}, \n---mouse position : {mouse_pos}---")
                 self.handle_request(floor_number)
 
     def update_all(self, scroll_y, scroll_x):

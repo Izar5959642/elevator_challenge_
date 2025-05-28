@@ -4,33 +4,31 @@ from models.delta_time import DeltaTime
 from models.button import Button
 class Floor:
     """Represents a floor with a button and timer."""
-    def __init__(self, floor_number, total_floors, building_x_pos, max_height):
+    def __init__(self, floor_number, total_floors, building_x_pos):
         self.floor_number = floor_number
         self.x_pos = START_X_POS_FLOOR
-        self.y_pos = ZERO_FLOOR - (FLOOR_HEIGHT * floor_number)
+        self.y_pos = ZERO_FLOOR - (TOTAL_HEIGHT_FLOOR * floor_number)
         self.timer = 0
         self.timer_str = ''
-        self.image = pygame.transform.scale(pygame.image.load(IMG_FLOOR), (FLOOR_WIDTH, FLOOR_HEIGHT - SPACER_HEIGHT))
-        self.color = BLACK
+        self.image = pygame.transform.scale(pygame.image.load(IMG_FLOOR), (FLOOR_WIDTH, TOTAL_HEIGHT_FLOOR - SPACER_HEIGHT))
         self.is_active = False
         self.font = pygame.font.Font('freesansbold.ttf', SIZE_BUTTON)
         self.building_x_pos = building_x_pos
         self.top_floor = total_floors - 1
         self.button = Button(floor_number, self.y_pos, building_x_pos)
-        self.surface = pygame.Surface((FLOOR_WIDTH, FLOOR_HEIGHT + SPACER_HEIGHT), pygame.SRCALPHA)
+        self.surface = pygame.Surface((FLOOR_WIDTH, TOTAL_HEIGHT_FLOOR), pygame.SRCALPHA)
 
     def set_request(self, time):
         """Set the floor's timer and mark as active."""
         self.timer = time
-        self.color = GREEN
         self.is_active = True
 
     def update(self, scroll_y, scroll_x):
         """Update timer and button state."""
-        if self.timer > 0:
+        if self.timer > 0.01:
             self.timer -= DeltaTime().delta_time
         else:
-            self.color = BLACK
+            self.timer = 0
             self.is_active = False
         self.update_timer_str()
         self.button.update(self.is_active, scroll_y, scroll_x)
