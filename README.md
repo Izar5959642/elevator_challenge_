@@ -20,7 +20,8 @@ project_root/
 │   ├── delta_time.py           # Singleton for managing time deltas
 │   ├── elevator.py             # Elevator class with movement and request handling
 │   ├── floor.py                # Floor class with buttons and timers
-│   └── building.py             # Building class managing floors and elevators
+│   ├── building.py             # Building class managing floors and elevators
+│   └── delta_time.py           # delta time singleton 
 ├── assets/
 │   ├── images/
 │   │   ├── building.png        # Image for floors

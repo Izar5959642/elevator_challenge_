@@ -2,7 +2,9 @@ import pygame
 from settings import *
 from models.delta_time import DeltaTime
 from models.button import Button
-class Floor:
+from models.interface_object import IObject
+
+class Floor(IObject):
     """Represents a floor with a button and timer."""
     def __init__(self, floor_number, total_floors, building_x_pos):
         self.floor_number = floor_number

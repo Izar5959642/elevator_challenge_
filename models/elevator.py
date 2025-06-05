@@ -2,8 +2,9 @@
 import pygame
 from models.delta_time import DeltaTime
 from settings import *
+from models.interface_object import IObject
 
-class Elevator:
+class Elevator(IObject):
     """Represent an elevator with movement and request handling."""
     def __init__(self, elevator_id):
         self.elevator_id = elevator_id
@@ -33,28 +34,28 @@ class Elevator:
 
     def update(self):
         """Update elevator position and time."""
-        diff = DeltaTime().delta_time
-        self.update_total_time(diff)
+        delta_time = DeltaTime().delta_time
+        self.update_total_time(delta_time)
         if self.requests:
-            self.move(diff)
+            self.move(delta_time)
 
-    def update_total_time(self, diff):
+    def update_total_time(self, delta_time):
         """Update remaining time for requests."""
         if self.total_time > 0.01:
-            self.total_time -= diff
+            self.total_time -= delta_time
         else:
             self.total_time = 0
 
-    def arrived(self, diff, target_y):
+    def arrived(self, delta_time, target_y):
         """Handle the elevator arriving at a floor."""
         self.y_pos = target_y
-        self.pause = PAUSE - diff
+        self.pause = PAUSE - delta_time
         self.sound.play()  # Play sound when reaching the floor
             
-    def move(self, diff):
+    def move(self, delta_time):
         target_floor = self.requests[0]
         target_y = ZERO_FLOOR - (TOTAL_HEIGHT_FLOOR * target_floor)
-        distance = PIX_PER_SEC * diff
+        distance = PIX_PER_SEC * delta_time
         direction = 1 if self.current_floor > target_floor else -1
         distance *= direction
 
@@ -63,10 +64,10 @@ class Elevator:
             self.y_pos += distance
 
             if (direction == 1 and self.y_pos > target_y) or (direction == -1 and self.y_pos < target_y):
-                self.arrived(diff, target_y)
+                self.arrived(delta_time, target_y)
                 
         else:  # arrived at the target floor and waiting 2 seconds
-            self.pause -= diff
+            self.pause -= delta_time
             if self.pause <= 0:
                 self.current_floor = self.requests.pop(0)
 

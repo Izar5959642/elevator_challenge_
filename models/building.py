@@ -62,9 +62,12 @@ class Building(IBuilding):
 
     def draw_all(self):
         """Draw all floors and elevators on the building's surface."""
-        self.surface.fill((0, 0, 0, 0))
+        self.surface.fill((135, 206, 235, 255))
         for floor in self.floors:
             floor.draw()
             self.surface.blit(floor.surface, (floor.x_pos, floor.y_pos))
         for elevator in self.elevators:
             elevator.draw(self.surface)
+
+
+
